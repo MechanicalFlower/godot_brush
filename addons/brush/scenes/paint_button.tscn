@@ -1,0 +1,14 @@
+[gd_scene format=2]
+
+[node name="Control" type="HBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -834.0
+margin_bottom = -560.0
+
+[node name="Button" type="Button" parent="."]
+margin_right = 12.0
+margin_bottom = 40.0
+hint_tooltip = "Brush mode, allowing to place 3D objects quickly"
+toggle_mode = true
+flat = true
