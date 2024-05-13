@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.3.0
+  rev: v4.6.0
   hooks:
   - id: fix-byte-order-marker   # Prevents weird UTF-8 encoding edge cases
   - id: check-case-conflict     # Check if case-insensitive filesystems would bork
