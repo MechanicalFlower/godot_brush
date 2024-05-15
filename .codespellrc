@@ -1,0 +1,3 @@
+[codespell]
+skip = assets/**
+ignore-words-list = lod,LOD

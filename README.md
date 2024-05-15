@@ -2,7 +2,9 @@
 
 # 🖌️ Brush Addon
 
-![Godot Badge](https://img.shields.io/badge/godot-3.5-blue?logo=Godot-Engine&logoColor=white) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white) ![license](https://img.shields.io/badge/license-MIT-green?logo=open-source-initiative&logoColor=white)
+![Godot Badge](https://img.shields.io/badge/godot-4.2-blue?logo=Godot-Engine&logoColor=white)
+![license](https://img.shields.io/badge/license-MIT-green?logo=open-source-initiative&logoColor=white)
+![reuse](./.reuse/REUSE-compliant.svg)
 
 A brush tool to quickly place 3D objects for [Godot Engine](https://godotengine.org/).
 
@@ -22,3 +24,11 @@ You can :
 ## References
 
 - [godotplacer](https://github.com/mnemoli/godotplacer/) by [mnemoli](https://github.com/mnemoli/)
+
+## Contributing
+
+![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)
+
+We welcome community contributions to this project.
+
+Please read our [Contributor Guide](CONTRIBUTING.md) for more information on how to get started.

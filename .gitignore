@@ -1,6 +1,7 @@
 # Godot-specific ignores
+.godot/
 .import/
-export.cfg
+gfxrecon_capture_*
 
 # Imported translations (automatically generated from CSV files)
 *.translation
@@ -8,3 +9,15 @@ export.cfg
 # Mono-specific ignores
 .mono/
 data_*/
+
+# Python-specific ignores
+venv/
+
+# Export output
+dist/
+build/
+override.cfg
+
+# Docs output
+reference.json
+site/

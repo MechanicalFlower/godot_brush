@@ -49,9 +49,7 @@ func _exit_tree():
 		_dock.free()
 		_dock = null
 
-	get_editor_interface().get_selection().disconnect(
-		"selection_changed", self.change_parent_node
-	)
+	get_editor_interface().get_selection().disconnect("selection_changed", self.change_parent_node)
 
 
 func get_plugin_icon() -> Texture:
@@ -61,7 +59,9 @@ func get_plugin_icon() -> Texture:
 	var theme = "light" if base_color.v > 0.5 else "dark"
 	var base_icon = load("res://addons/brush/assets/icons/icon_%s.svg" % [theme]) as Texture
 
-	var size = get_editor_interface().get_editor_viewport().get_icon("Godot", "EditorIcons").get_size()
+	var size = (
+		get_editor_interface().get_editor_viewport().get_icon("Godot", "EditorIcons").get_size()
+	)
 	var image: Image = base_icon.get_data()
 	image.resize(size.x, size.y, Image.INTERPOLATE_TRILINEAR)
 	var texture = ImageTexture.new()
@@ -104,7 +104,9 @@ func forward_Node3D_gui_input(camera: Camera3D, event: InputEvent):
 			var ray_dir := camera.project_ray_normal(event.position)
 			var ray_distance := camera.far
 			var space_state := get_viewport().get_world_3d().direct_space_state
-			var query := PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_dir * ray_distance)
+			var query := PhysicsRayQueryParameters3D.create(
+				ray_origin, ray_origin + ray_dir * ray_distance
+			)
 			var hit := space_state.intersect_ray(query)
 			if !hit.is_empty() and hit.has("position"):
 				_current_item.global_transform.origin = hit.get("position") as Vector3
