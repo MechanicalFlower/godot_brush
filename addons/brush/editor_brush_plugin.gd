@@ -1,4 +1,4 @@
-tool
+@tool
 extends EditorPlugin
 
 var PaintButton = preload("res://addons/brush/scenes/paint_button.tscn")
@@ -9,7 +9,7 @@ var placing := false
 
 var _dock: Control = null
 var _resource: PackedScene = null
-var _current_item: Spatial = null
+var _current_item: Node3D = null
 var _tree: Tree = null
 var _parent_node: Node = null
 
@@ -19,38 +19,38 @@ func _enter_tree():
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _dock)
 
 	var button := _dock.get_node("Button") as Button
-	button.connect("pressed", self, "toggle_painting")
+	button.connect("pressed", self.toggle_painting)
 	button.set_button_icon(get_plugin_icon())
 
 	var vsplit = get_editor_interface().get_file_system_dock().get_child(3)
 	for c in vsplit.get_children():
 		if c is Tree:
 			_tree = c
-			_tree.connect("cell_selected", self, "file_picked")
+			_tree.connect("cell_selected", self.file_picked)
 			break
 
 	change_parent_node()
-	get_editor_interface().get_selection().connect("selection_changed", self, "change_parent_node")
+	get_editor_interface().get_selection().connect("selection_changed", self.change_parent_node)
 
 
 func _exit_tree():
-	_tree.disconnect("cell_selected", self, "file_picked")
+	_tree.disconnect("cell_selected", self.file_picked)
 
 	if _current_item != null and is_instance_valid(_current_item):
 		_current_item.free()
 		_current_item = null
 
 	if _dock != null and is_instance_valid(_dock):
-		remove_control_from_container(CONTAINER_SPATIAL_EDITOR_MENU, _dock)
+		remove_control_from_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU, _dock)
 
 		var button := _dock.get_node("Button") as Button
-		button.disconnect("pressed", self, "toggle_painting")
+		button.disconnect("pressed", self.toggle_painting)
 
 		_dock.free()
 		_dock = null
 
 	get_editor_interface().get_selection().disconnect(
-		"selection_changed", self, "change_parent_node"
+		"selection_changed", self.change_parent_node
 	)
 
 
@@ -84,13 +84,13 @@ func toggle_painting():
 		if _current_item != null and is_instance_valid(_current_item):
 			_current_item.free()
 			_current_item = null
-		button.pressed = false
+		button.set_pressed(false)
 	else:
 		set_up_temp_object()
-		button.pressed = true
+		button.set_pressed(true)
 
 
-func forward_spatial_gui_input(camera: Camera, event: InputEvent):
+func forward_Node3D_gui_input(camera: Camera3D, event: InputEvent):
 	if !painting or _current_item == null or not is_instance_valid(_current_item):
 		return false
 
@@ -103,29 +103,30 @@ func forward_spatial_gui_input(camera: Camera, event: InputEvent):
 			var ray_origin := camera.project_ray_origin(event.position)
 			var ray_dir := camera.project_ray_normal(event.position)
 			var ray_distance := camera.far
-			var space_state := get_viewport().world.direct_space_state
-			var hit := space_state.intersect_ray(ray_origin, ray_origin + ray_dir * ray_distance)
-			if !hit.empty() and hit.has("position"):
+			var space_state := get_viewport().get_world_3d().direct_space_state
+			var query := PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_dir * ray_distance)
+			var hit := space_state.intersect_ray(query)
+			if !hit.is_empty() and hit.has("position"):
 				_current_item.global_transform.origin = hit.get("position") as Vector3
 			return false
 
 	elif (
 		event is InputEventMouseButton
 		and event.pressed == true
-		and event.button_index == BUTTON_LEFT
+		and event.button_index == MOUSE_BUTTON_RIGHT
 	):
 		placing = true
 
 	elif (
 		event is InputEventMouseButton
 		and event.pressed == false
-		and event.button_index == BUTTON_LEFT
+		and event.button_index == MOUSE_BUTTON_LEFT
 	):
 		placing = false
 		var undo_redo := get_undo_redo()
 		undo_redo.create_action("Add object")
 
-		var new_item := _resource.instance() as Spatial
+		var new_item := _resource.instance() as Node3D
 		undo_redo.add_do_method(
 			self, "redo_paint", new_item, _current_item.global_transform, _parent_node
 		)
@@ -134,14 +135,14 @@ func forward_spatial_gui_input(camera: Camera, event: InputEvent):
 		undo_redo.commit_action()
 		return true
 
-	elif event is InputEventMouse and event.button_index == BUTTON_WHEEL_DOWN:
+	elif event is InputEventMouse and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 		if Input.is_physical_key_pressed(KEY_SHIFT):
 			return false
 
 		_current_item.scale = _current_item.scale * 0.9
 		return true
 
-	elif event is InputEventMouse and event.button_index == BUTTON_WHEEL_UP:
+	elif event is InputEventMouse and event.button_index == MOUSE_BUTTON_WHEEL_UP:
 		if Input.is_physical_key_pressed(KEY_SHIFT):
 			return false
 
@@ -186,19 +187,19 @@ func set_up_temp_object() -> void:
 			_current_item.set_name("TEMPORARY OBJECT")
 
 
-func add_temp_item(resource: PackedScene) -> Spatial:
-	var new_item := resource.instance() as Spatial
+func add_temp_item(resource: PackedScene) -> Node3D:
+	var new_item := resource.instance() as Node3D
 	get_editor_interface().get_edited_scene_root().add_child(new_item)
-	if new_item is MeshInstance:
+	if new_item is MeshInstance3D:
 		new_item.material_override = TempObjectMat
 	else:
 		for c in new_item.get_children():
-			if c is MeshInstance:
+			if c is MeshInstance3D:
 				c.material_override = TempObjectMat
 	return new_item
 
 
-func redo_paint(new_item: Spatial, transform: Transform, parent_node: Node):
+func redo_paint(new_item: Node3D, transform: Transform3D, parent_node: Node):
 	if parent_node == null:
 		parent_node = get_editor_interface().get_edited_scene_root()
 	parent_node.add_child(new_item)
